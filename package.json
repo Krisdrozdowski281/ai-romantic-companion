@@ -1,0 +1,50 @@
+{
+  "name": "ai-romantic-companion",
+  "version": "0.1.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start --dev-client",
+    "android": "expo run:android",
+    "lint": "expo lint",
+    "typecheck": "tsc --noEmit",
+    "test": "jest --runInBand",
+    "test:watch": "jest --watch",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "verify": "npm run format:check && npm run lint && npm run typecheck && npm test"
+  },
+  "dependencies": {
+    "@config-plugins/react-native-webrtc": "^15.0.1",
+    "@elevenlabs/react-native": "^1.2.15",
+    "@livekit/react-native": "^2.11.1",
+    "@livekit/react-native-expo-plugin": "^1.0.2",
+    "@livekit/react-native-webrtc": "^144.1.1",
+    "expo": "~57.0.7",
+    "expo-asset": "~57.0.6",
+    "expo-audio": "~57.0.2",
+    "expo-constants": "~57.0.6",
+    "expo-dev-client": "~57.0.7",
+    "expo-linking": "~57.0.3",
+    "expo-router": "~57.0.7",
+    "expo-status-bar": "~57.0.1",
+    "livekit-client": "^2.20.1",
+    "react": "19.2.3",
+    "react-native": "0.86.0",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "4.25.2"
+  },
+  "devDependencies": {
+    "@react-native/jest-preset": "^0.86.0",
+    "@testing-library/react-native": "^14.0.1",
+    "@types/jest": "29.5.14",
+    "@types/react": "~19.2.4",
+    "eslint": "^9.39.5",
+    "eslint-config-expo": "~57.0.0",
+    "jest": "~29.7.0",
+    "jest-expo": "~57.0.2",
+    "prettier": "^3.9.5",
+    "test-renderer": "^1.2.0",
+    "typescript": "~6.0.3"
+  }
+}

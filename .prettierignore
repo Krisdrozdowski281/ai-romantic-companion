@@ -1,0 +1,7 @@
+node_modules/
+.expo/
+coverage/
+android/
+ios/
+package-lock.json
+BUILD_PLAN.md
