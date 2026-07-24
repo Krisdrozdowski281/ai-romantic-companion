@@ -32,7 +32,10 @@ const VoiceContext = createContext<VoiceContextValue | null>(null);
 
 export function ElevenLabsVoiceProvider({ children }: PropsWithChildren) {
   const [service] = useState(() => {
-    const environment = validateEnvironment(process.env);
+    const environment = validateEnvironment({
+      EXPO_PUBLIC_ELEVENLABS_AGENT_ID:
+        process.env.EXPO_PUBLIC_ELEVENLABS_AGENT_ID,
+    });
     return new VoiceService({
       ...(environment.success
         ? { agentId: environment.value.elevenLabsAgentId }

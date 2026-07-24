@@ -7,9 +7,9 @@ export type EnvironmentResult =
 
 const AGENT_ID_PATTERN = /^agent_[a-zA-Z0-9]+$/;
 
-export function validateEnvironment(
-  environment: Pick<NodeJS.ProcessEnv, 'EXPO_PUBLIC_ELEVENLABS_AGENT_ID'>,
-): EnvironmentResult {
+export function validateEnvironment(environment: {
+  EXPO_PUBLIC_ELEVENLABS_AGENT_ID?: string | undefined;
+}): EnvironmentResult {
   const agentId = environment.EXPO_PUBLIC_ELEVENLABS_AGENT_ID?.trim();
 
   if (!agentId) {
