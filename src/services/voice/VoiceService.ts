@@ -199,6 +199,9 @@ export class VoiceService {
         );
         break;
       case 'disconnected':
+        if (this.state.connection === 'error') {
+          break;
+        }
         if (this.state.connection === 'ending' || !this.desiredActive) {
           this.setState({ ...INITIAL_STATE, muted: this.state.muted });
         } else {
