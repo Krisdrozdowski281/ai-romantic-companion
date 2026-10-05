@@ -17,3 +17,17 @@ export function isPreferenceSelection(value: {
     ) && (VOICE_IDS as readonly string[]).includes(value.voiceId)
   );
 }
+
+export interface Preferences {
+  personalityModeId: PersonalityMode;
+  voiceId: VoiceId;
+}
+export const DEFAULT_PREFERENCES: Preferences = {
+  personalityModeId: 'caring',
+  voiceId: 'voice_charlotte',
+};
+export const VOICE_LABELS: Record<VoiceId, string> = {
+  voice_hope: 'Hope',
+  voice_sarah: 'Sarah',
+  voice_charlotte: 'Charlotte',
+};

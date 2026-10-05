@@ -1,33 +1,22 @@
-import { Link, Redirect } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { Link } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { useAuth } from '@/features/auth/AuthProvider';
-import { supabase } from '@/lib/supabase';
+import { useCompanion } from '@/features/companion/CompanionProvider';
+import { VOICE_LABELS } from '@/features/companion/preferences';
 export default function Home() {
-  const { session, loading } = useAuth();
-  const [onboarded, setOnboarded] = useState<boolean | null>(null);
-  useEffect(() => {
-    if (!supabase || !session) return;
-    supabase
-      .from('profiles')
-      .select('onboarding_completed_at')
-      .eq('id', session.user.id)
-      .maybeSingle()
-      .then(({ data }) => setOnboarded(Boolean(data?.onboarding_completed_at)));
-  }, [session]);
-  if (loading || onboarded === null) return null;
-  if (!session) return <Redirect href={'/(auth)' as never} />;
-  if (!onboarded) return <Redirect href={'/(app)/onboarding' as never} />;
+  const { preferences } = useCompanion();
   return (
     <View style={styles.page}>
       <Text style={styles.title}>Luna</Text>
       <Text style={styles.copy}>Your AI companion is ready when you are.</Text>
+      <Text style={styles.copy}>
+        {preferences.personalityModeId} · {VOICE_LABELS[preferences.voiceId]}
+      </Text>
       <Link href="/conversation" asChild>
-        <Pressable style={styles.button}>
+        <Pressable accessibilityRole="button" style={styles.button}>
           <Text style={styles.text}>Start private conversation</Text>
         </Pressable>
       </Link>
-      <Link href={'/(app)/settings' as never}>
+      <Link href="/settings">
         <Text style={styles.link}>Settings and preferences</Text>
       </Link>
     </View>
