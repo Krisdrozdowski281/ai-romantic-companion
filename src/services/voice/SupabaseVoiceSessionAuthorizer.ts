@@ -1,7 +1,8 @@
 import { supabase } from '@/lib/supabase';
+import type { VoiceAuthorization } from './types';
 
 export interface VoiceSessionAuthorizer {
-  authorize(): Promise<string>;
+  authorize(): Promise<VoiceAuthorization>;
 }
 
 function getFunctionErrorStatus(error: unknown): number | undefined {
@@ -38,6 +39,10 @@ export const supabaseVoiceSessionAuthorizer: VoiceSessionAuthorizer = {
         throw new Error(
           'Your sign-in session was rejected. Please sign in again.',
         );
+      if (status === 403)
+        throw new Error(
+          'Complete onboarding and choose approved preferences before starting a conversation.',
+        );
       if (status === 502)
         throw new Error(
           'The private voice service rejected authorization. Check the ElevenLabs agent and API key.',
@@ -48,8 +53,19 @@ export const supabaseVoiceSessionAuthorizer: VoiceSessionAuthorizer = {
         );
       throw new Error('Could not authorize the private voice session.');
     }
-    if (!data || typeof data.conversationToken !== 'string')
+    if (
+      !data ||
+      typeof data.conversationToken !== 'string' ||
+      !data.conversationToken.trim() ||
+      typeof data.voiceId !== 'string' ||
+      !/^[a-zA-Z0-9]{20}$/.test(data.voiceId) ||
+      !['caring', 'playful', 'confident'].includes(data.personalityMode)
+    )
       throw new Error('Could not authorize the private voice session.');
-    return data.conversationToken;
+    return {
+      conversationToken: data.conversationToken,
+      voiceId: data.voiceId,
+      personalityMode: data.personalityMode,
+    };
   },
 };

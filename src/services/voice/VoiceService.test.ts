@@ -11,7 +11,13 @@ function createHarness(permission: 'granted' | 'denied' = 'granted') {
     requestPermission: jest.fn().mockResolvedValue(permission),
   };
   const service = new VoiceService({
-    agentId: 'agent_test123',
+    sessionAuthorizer: {
+      authorize: async () => ({
+        conversationToken: 'mock-token',
+        voiceId: 'abcdefghijklmnopqrst',
+        personalityMode: 'caring',
+      }),
+    },
     permissionGateway,
   });
   service.bindAdapter(adapter);
@@ -105,7 +111,13 @@ describe('VoiceService', () => {
       setMuted: jest.fn(),
     };
     const service = new VoiceService({
-      agentId: 'agent_test123',
+      sessionAuthorizer: {
+        authorize: async () => ({
+          conversationToken: 'mock-token',
+          voiceId: 'abcdefghijklmnopqrst',
+          personalityMode: 'caring',
+        }),
+      },
       permissionGateway: {
         requestPermission: () =>
           new Promise((resolve) => {

@@ -28,13 +28,19 @@ describe('supabaseVoiceSessionAuthorizer', () => {
       error: null,
     });
     invoke.mockResolvedValue({
-      data: { conversationToken: 'conversation-token' },
+      data: {
+        conversationToken: 'conversation-token',
+        voiceId: 'abcdefghijklmnopqrst',
+        personalityMode: 'caring',
+      },
       error: null,
     });
 
-    await expect(supabaseVoiceSessionAuthorizer.authorize()).resolves.toBe(
-      'conversation-token',
-    );
+    await expect(supabaseVoiceSessionAuthorizer.authorize()).resolves.toEqual({
+      conversationToken: 'conversation-token',
+      voiceId: 'abcdefghijklmnopqrst',
+      personalityMode: 'caring',
+    });
     expect(invoke).toHaveBeenCalledWith('elevenlabs-session', {
       headers: { Authorization: 'Bearer session-token' },
     });

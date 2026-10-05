@@ -1,63 +1,88 @@
 import { useState } from 'react';
-import { Redirect, router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
+import { useCompanion } from '@/features/companion/CompanionProvider';
 import { useAuth } from '@/features/auth/AuthProvider';
-import { supabase } from '@/lib/supabase';
-
-const DISCLOSURE_VERSION = '2026-07-27';
 export default function Onboarding() {
-  const { session, loading } = useAuth();
+  const { completeOnboarding } = useCompanion();
+  const { signOut, error: authError } = useAuth();
   const [adult, setAdult] = useState(false);
   const [disclosed, setDisclosed] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  if (loading) return null;
-  if (!session) return <Redirect href={'/(auth)' as never} />;
+  const [busy, setBusy] = useState(false);
   const complete = async () => {
-    if (!adult || !disclosed || !supabase) {
-      setError('Confirm both statements to continue.');
-      return;
+    if (busy) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await completeOnboarding(adult, disclosed);
+    } catch (failure) {
+      setError(
+        failure instanceof Error
+          ? failure.message
+          : 'Could not save onboarding. Try again.',
+      );
+    } finally {
+      setBusy(false);
     }
-    const now = new Date().toISOString();
-    const { error } = await supabase.from('profiles').upsert({
-      id: session.user.id,
-      adult_declared_at: now,
-      accepted_disclosure_version: DISCLOSURE_VERSION,
-      onboarding_completed_at: now,
-    });
-    if (error) {
-      setError('Could not save onboarding. Try again.');
-      return;
-    }
-    router.replace('/(app)' as never);
   };
   return (
-    <View style={styles.page}>
+    <ScrollView contentContainerStyle={styles.page}>
       <Text style={styles.title}>Before we begin</Text>
       <Text style={styles.copy}>
         Luna is artificial intelligence. She is not human, conscious, physically
         present, a therapist, or an emergency service.
       </Text>
-      <Pressable style={styles.choice} onPress={() => setAdult(!adult)}>
+      <Pressable
+        accessibilityRole="checkbox"
+        accessibilityLabel="I am 18 or older"
+        accessibilityState={{ checked: adult, disabled: busy }}
+        disabled={busy}
+        style={styles.choice}
+        onPress={() => setAdult(!adult)}
+      >
         <Text>
-          {adult ? '✓' : '○'} I am an adult and understand this is a
-          declaration, not age verification.
+          {adult ? '✓' : '○'} I am 18 or older. This is my age declaration, not
+          identity or age verification.
         </Text>
       </Pressable>
-      <Pressable style={styles.choice} onPress={() => setDisclosed(!disclosed)}>
+      <Pressable
+        accessibilityRole="checkbox"
+        accessibilityLabel="I accept the AI disclosure"
+        accessibilityState={{ checked: disclosed, disabled: busy }}
+        disabled={busy}
+        style={styles.choice}
+        onPress={() => setDisclosed(!disclosed)}
+      >
         <Text>
           {disclosed ? '✓' : '○'} I understand and accept the AI disclosure.
         </Text>
       </Pressable>
-      {error && <Text style={styles.error}>{error}</Text>}
-      <Pressable style={styles.button} onPress={() => void complete()}>
-        <Text style={styles.buttonText}>Continue</Text>
+      {(error || authError) && (
+        <Text accessibilityRole="alert" style={styles.error}>
+          {error || authError}
+        </Text>
+      )}
+      <Pressable
+        accessibilityRole="button"
+        disabled={busy}
+        style={styles.button}
+        onPress={() => void complete()}
+      >
+        <Text style={styles.buttonText}>{busy ? 'Saving…' : 'Continue'}</Text>
       </Pressable>
-    </View>
+      <Pressable
+        accessibilityRole="button"
+        disabled={busy}
+        onPress={() => void signOut()}
+      >
+        <Text style={styles.copy}>Sign out</Text>
+      </Pressable>
+    </ScrollView>
   );
 }
 const styles = StyleSheet.create({
   page: {
-    flex: 1,
+    flexGrow: 1,
     justifyContent: 'center',
     padding: 28,
     backgroundColor: '#fffaf8',

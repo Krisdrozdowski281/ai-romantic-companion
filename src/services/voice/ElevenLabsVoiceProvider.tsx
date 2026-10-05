@@ -80,8 +80,12 @@ function ElevenLabsBridge({ service }: { service: VoiceService }) {
 
   useEffect(() => {
     service.bindAdapter({
-      startSession: (conversationToken) =>
-        controls.startSession({ conversationToken }),
+      startSession: ({ conversationToken, voiceId, personalityMode }) =>
+        controls.startSession({
+          conversationToken,
+          overrides: { tts: { voiceId } },
+          dynamicVariables: { personality_mode: personalityMode },
+        }),
       endSession: controls.endSession,
       setMuted,
     });

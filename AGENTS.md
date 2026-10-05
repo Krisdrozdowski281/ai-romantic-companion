@@ -11,7 +11,10 @@ This repository follows `BUILD_PLAN.md`, one sprint at a time. Do not add later-
 - Lint: `npm run lint`
 - Type-check: `npm run typecheck`
 - Test: `npm test`
-- Full verification: `npm run verify`
+- Full application verification: `npm run verify`
+- Edge Function type check: `npm run check:edge`
+- Mock-only Edge Function/auth tests: `npm run test:edge`
+- Empty-database migration/RLS tests (Docker + local Supabase required): `npm run test:db`
 
 ## Layout
 
@@ -32,3 +35,7 @@ This repository follows `BUILD_PLAN.md`, one sprint at a time. Do not add later-
 - Add tests for behavior changes. In later sprints, authentication, Row Level Security, entitlements, and usage logic require dedicated tests.
 - Update setup and architecture documentation whenever those behaviors change.
 - Work is done only when relevant checks pass and the final diff is reviewed for secrets, lifecycle errors, unhandled states, and sprint scope.
+
+## Sprint 2 verification boundary
+
+Use `npm run test:db` to verify migrations in a temporary empty database without resetting existing local data. Keep provider calls mocked in automated tests. Record remote deployment and physical Android voice acceptance separately; do not claim private-agent audio works until the phone test passes. Keep server voice IDs in ignored Edge Function environment files.

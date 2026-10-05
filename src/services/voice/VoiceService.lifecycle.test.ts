@@ -18,7 +18,13 @@ describe('VoiceService lifecycle guards', () => {
 
   it('preserves a provider error when the SDK subsequently reports disconnected', async () => {
     const service = new VoiceService({
-      agentId: 'agent_test123',
+      sessionAuthorizer: {
+        authorize: async () => ({
+          conversationToken: 'mock-token',
+          voiceId: 'abcdefghijklmnopqrst',
+          personalityMode: 'caring',
+        }),
+      },
       permissionGateway: {
         requestPermission: jest.fn().mockResolvedValue('granted'),
       },
@@ -50,7 +56,13 @@ describe('VoiceService lifecycle guards', () => {
       setMuted: jest.fn(),
     };
     const service = new VoiceService({
-      agentId: 'agent_test123',
+      sessionAuthorizer: {
+        authorize: async () => ({
+          conversationToken: 'mock-token',
+          voiceId: 'abcdefghijklmnopqrst',
+          personalityMode: 'caring',
+        }),
+      },
       permissionGateway: {
         requestPermission: jest.fn().mockResolvedValue('granted'),
       },

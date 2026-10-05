@@ -30,8 +30,32 @@ export function validateEnvironment(environment: {
       error: 'Supabase URL is invalid. Use an HTTPS project URL.',
     };
   }
-  if (parsedUrl.protocol !== 'https:')
+  const loopback = ['localhost', '127.0.0.1', '10.0.2.2'].includes(
+    parsedUrl.hostname,
+  );
+  if (
+    parsedUrl.username ||
+    parsedUrl.password ||
+    parsedUrl.search ||
+    parsedUrl.hash ||
+    (parsedUrl.pathname !== '/' && parsedUrl.pathname !== '')
+  )
+    return {
+      success: false,
+      error:
+        'Use the Supabase project URL without credentials, paths, or query parameters.',
+    };
+  if (
+    parsedUrl.protocol !== 'https:' &&
+    !(parsedUrl.protocol === 'http:' && loopback)
+  )
     return { success: false, error: 'Supabase URL must use HTTPS.' };
+  if (!/^sb_publishable_[A-Za-z0-9_-]{4,}$/.test(key))
+    return {
+      success: false,
+      error:
+        'Use a Supabase publishable client key (sb_publishable_). Never use a server secret or service-role key.',
+    };
 
   return {
     success: true,

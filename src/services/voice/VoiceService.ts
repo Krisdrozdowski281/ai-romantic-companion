@@ -18,8 +18,6 @@ const INITIAL_STATE: VoiceState = {
 };
 
 export interface VoiceServiceOptions {
-  /** Legacy test-only compatibility; production uses sessionAuthorizer. */
-  agentId?: string;
   configurationError?: string;
   permissionGateway: MicrophonePermissionGateway;
   sessionAuthorizer?: VoiceSessionAuthorizer;
@@ -39,7 +37,11 @@ export class VoiceService {
 
   constructor(options: VoiceServiceOptions) {
     this.sessionAuthorizer = options.sessionAuthorizer ?? {
-      authorize: async () => options.agentId ?? '',
+      authorize: async () => {
+        throw new Error(
+          'Voice authorization is unavailable. Please sign in again.',
+        );
+      },
     };
     this.permissionGateway = options.permissionGateway;
     this.state = options.configurationError
@@ -95,11 +97,15 @@ export class VoiceService {
       this.desiredActive = true;
       this.hasConnected = false;
       this.setState({ ...this.state, connection: 'connecting', error: null });
-      const conversationToken = await this.sessionAuthorizer.authorize();
-      if (!conversationToken)
+      const authorization = await this.sessionAuthorizer.authorize();
+      if (!authorization?.conversationToken)
         throw new Error('Voice authorization is unavailable.');
       if (operationId !== this.operationId || this.disposed) return;
-      await this.adapter.startSession(conversationToken);
+      await this.adapter.startSession(authorization);
+      if (operationId !== this.operationId || this.disposed) {
+        // Close an SDK connection that completes after cancellation.
+        await this.adapter.endSession();
+      }
     } catch (error: unknown) {
       if (operationId !== this.operationId || this.disposed) return;
       this.desiredActive = false;

@@ -9,3 +9,5 @@ BUILD_PLAN.md
 .claude-flow/
 review-reports/
 supabase/.temp/
+
+.codex-remote-attachments/

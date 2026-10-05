@@ -30,9 +30,14 @@ export interface VoiceState {
 }
 
 export interface VoiceAdapter {
-  startSession(conversationToken: string): void | Promise<void>;
+  startSession(authorization: VoiceAuthorization): void | Promise<void>;
   endSession(): void | Promise<void>;
   setMuted(muted: boolean): void;
+}
+export interface VoiceAuthorization {
+  conversationToken: string;
+  voiceId: string;
+  personalityMode: 'caring' | 'playful' | 'confident';
 }
 
 export interface MicrophonePermissionGateway {
