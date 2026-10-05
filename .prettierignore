@@ -5,3 +5,7 @@ android/
 ios/
 package-lock.json
 BUILD_PLAN.md
+.claude/
+.claude-flow/
+review-reports/
+supabase/.temp/

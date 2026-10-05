@@ -133,6 +133,20 @@ The automated checks cannot prove ten-minute audio stability, barge-in quality, 
 - **`unauthorized` in `adb devices`:** revoke USB debugging authorizations on the phone, reconnect, and accept the RSA prompt.
 - **Microphone remains denied:** open **Android Settings → Apps → AI Companion Voice Proof → Permissions → Microphone** and choose Allow.
 - **Configuration error:** check `.env.local`, ensure the value begins with `agent_`, then restart Metro with `npx expo start --dev-client --clear`.
-- **Connection rejected:** confirm the development agent exists, voice conversation is enabled, and authentication is disabled for this Sprint 1 proof.
+- **Private voice authorization rejected (502):** confirm the development agent exists, authentication is enabled in ElevenLabs, and both Edge Function secrets are present. The API key must include the ElevenAgents/ConvAI permission required by the conversation-token endpoint and must not have an IP allowlist that excludes Supabase egress. Keep `elevenlabs-session`'s legacy platform JWT check disabled while `@supabase/server` validates the signed-in user.
 
 Official references: [ElevenLabs React Native SDK](https://elevenlabs.io/docs/eleven-agents/libraries/react-native), [ElevenLabs Expo integration](https://elevenlabs.io/docs/eleven-agents/guides/integrations/expo-react-native), and [Expo development builds](https://docs.expo.dev/develop/development-builds/create-a-build/).
+
+# Sprint 2 development setup
+
+## Supabase
+
+1. Install Docker Desktop and ensure it is running.
+2. Install the project CLI with `npm ci`, then initialise/start the local stack with `npx supabase init` and `npx supabase start`.
+3. Apply migrations with `npx supabase db reset`. Run the SQL tests with `npx supabase test db` after configuring pgTAP locally.
+4. Create a Supabase development project, then set `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in `.env.local`. These public values may be bundled; no server keys belong there.
+5. Set `ELEVENLABS_API_KEY` and `ELEVENLABS_AGENT_ID` only as Edge Function secrets: `npx supabase secrets set ELEVENLABS_API_KEY=... ELEVENLABS_AGENT_ID=...`. Deploy using `npx supabase functions deploy elevenlabs-session`. The function uses `@supabase/server` to validate the user's bearer token, so `supabase/config.toml` keeps the function's platform `verify_jwt` pre-check disabled for publishable-key clients.
+
+In ElevenLabs, make the development agent private before testing. Enable email confirmation in Supabase as desired, configure the `ai-companion://` redirect URL, and use the Supabase email inbox or provider to complete sign-up.
+
+The mobile client obtains a short-lived WebRTC conversation token from the authenticated Edge Function immediately before connecting; it never contains the ElevenLabs API key. Rebuild/restart the Expo development client after native dependency changes.

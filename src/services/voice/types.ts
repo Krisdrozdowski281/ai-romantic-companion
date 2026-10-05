@@ -30,7 +30,7 @@ export interface VoiceState {
 }
 
 export interface VoiceAdapter {
-  startSession(agentId: string): void | Promise<void>;
+  startSession(conversationToken: string): void | Promise<void>;
   endSession(): void | Promise<void>;
   setMuted(muted: boolean): void;
 }

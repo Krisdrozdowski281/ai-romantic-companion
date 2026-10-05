@@ -1,32 +1,40 @@
 export interface AppEnvironment {
-  elevenLabsAgentId: string;
+  supabaseUrl: string;
+  supabasePublishableKey: string;
 }
 
 export type EnvironmentResult =
   { success: true; value: AppEnvironment } | { success: false; error: string };
 
-const AGENT_ID_PATTERN = /^agent_[a-zA-Z0-9]+$/;
-
 export function validateEnvironment(environment: {
-  EXPO_PUBLIC_ELEVENLABS_AGENT_ID?: string | undefined;
+  EXPO_PUBLIC_SUPABASE_URL?: string | undefined;
+  EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY?: string | undefined;
 }): EnvironmentResult {
-  const agentId = environment.EXPO_PUBLIC_ELEVENLABS_AGENT_ID?.trim();
+  const url = environment.EXPO_PUBLIC_SUPABASE_URL?.trim();
+  const key = environment.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim();
 
-  if (!agentId) {
+  if (!url || !key) {
     return {
       success: false,
       error:
-        'Development agent ID is missing. Set EXPO_PUBLIC_ELEVENLABS_AGENT_ID and restart Expo.',
+        'Supabase configuration is missing. Set EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY, then restart Expo.',
     };
   }
 
-  if (!AGENT_ID_PATTERN.test(agentId)) {
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(url);
+  } catch {
     return {
       success: false,
-      error:
-        'Development agent ID is invalid. It must start with "agent_" and contain only letters and numbers after the prefix.',
+      error: 'Supabase URL is invalid. Use an HTTPS project URL.',
     };
   }
+  if (parsedUrl.protocol !== 'https:')
+    return { success: false, error: 'Supabase URL must use HTTPS.' };
 
-  return { success: true, value: { elevenLabsAgentId: agentId } };
+  return {
+    success: true,
+    value: { supabaseUrl: url, supabasePublishableKey: key },
+  };
 }

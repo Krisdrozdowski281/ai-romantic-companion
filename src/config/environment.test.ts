@@ -1,12 +1,18 @@
 import { validateEnvironment } from './environment';
 
 describe('validateEnvironment', () => {
-  it('accepts a public development agent ID', () => {
+  it('accepts public Supabase configuration', () => {
     expect(
-      validateEnvironment({ EXPO_PUBLIC_ELEVENLABS_AGENT_ID: 'agent_abc123' }),
+      validateEnvironment({
+        EXPO_PUBLIC_SUPABASE_URL: 'https://example.supabase.co',
+        EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_test',
+      }),
     ).toEqual({
       success: true,
-      value: { elevenLabsAgentId: 'agent_abc123' },
+      value: {
+        supabaseUrl: 'https://example.supabase.co',
+        supabasePublishableKey: 'sb_publishable_test',
+      },
     });
   });
 
@@ -15,13 +21,11 @@ describe('validateEnvironment', () => {
     expect(result.success).toBe(false);
   });
 
-  it.each(['not_an_agent_id', 'abc123', 'agent_bad-value', 'agent_'])(
-    'rejects %s',
-    (value) => {
-      const result = validateEnvironment({
-        EXPO_PUBLIC_ELEVENLABS_AGENT_ID: value,
-      });
-      expect(result.success).toBe(false);
-    },
-  );
+  it.each(['not-a-url', 'http://example.com'])('rejects %s', (value) => {
+    const result = validateEnvironment({
+      EXPO_PUBLIC_SUPABASE_URL: value,
+      EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_test',
+    });
+    expect(result.success).toBe(false);
+  });
 });

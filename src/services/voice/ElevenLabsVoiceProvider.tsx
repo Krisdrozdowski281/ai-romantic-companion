@@ -15,9 +15,8 @@ import {
   useSyncExternalStore,
 } from 'react';
 
-import { validateEnvironment } from '@/config/environment';
-
 import { expoMicrophonePermissionGateway } from './ExpoMicrophonePermissionGateway';
+import { supabaseVoiceSessionAuthorizer } from './SupabaseVoiceSessionAuthorizer';
 import { VoiceService } from './VoiceService';
 import type { VoiceState } from './types';
 
@@ -32,15 +31,9 @@ const VoiceContext = createContext<VoiceContextValue | null>(null);
 
 export function ElevenLabsVoiceProvider({ children }: PropsWithChildren) {
   const [service] = useState(() => {
-    const environment = validateEnvironment({
-      EXPO_PUBLIC_ELEVENLABS_AGENT_ID:
-        process.env.EXPO_PUBLIC_ELEVENLABS_AGENT_ID,
-    });
     return new VoiceService({
-      ...(environment.success
-        ? { agentId: environment.value.elevenLabsAgentId }
-        : { configurationError: environment.error }),
       permissionGateway: expoMicrophonePermissionGateway,
+      sessionAuthorizer: supabaseVoiceSessionAuthorizer,
     });
   });
   const state = useSyncExternalStore(
@@ -87,7 +80,8 @@ function ElevenLabsBridge({ service }: { service: VoiceService }) {
 
   useEffect(() => {
     service.bindAdapter({
-      startSession: (agentId) => controls.startSession({ agentId }),
+      startSession: (conversationToken) =>
+        controls.startSession({ conversationToken }),
       endSession: controls.endSession,
       setMuted,
     });

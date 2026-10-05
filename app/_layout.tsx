@@ -2,15 +2,15 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
 import { ElevenLabsVoiceProvider } from '@/services/voice/ElevenLabsVoiceProvider';
+import { AuthProvider } from '@/features/auth/AuthProvider';
 
 export default function RootLayout() {
   return (
     <ElevenLabsVoiceProvider>
-      <StatusBar style="dark" />
-      <Stack>
-        <Stack.Screen name="index" options={{ title: 'Welcome' }} />
-        <Stack.Screen name="conversation" options={{ title: 'Conversation' }} />
-      </Stack>
+      <AuthProvider>
+        <StatusBar style="dark" />
+        <Stack screenOptions={{ headerShown: false }} />
+      </AuthProvider>
     </ElevenLabsVoiceProvider>
   );
 }

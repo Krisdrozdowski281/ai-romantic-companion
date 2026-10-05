@@ -9,9 +9,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   scheme: 'ai-companion',
   extra: {
     eas: {
-    projectId: '9672fd55-5640-4c07-8129-2b4576d38805',
+      projectId: '9672fd55-5640-4c07-8129-2b4576d38805',
+    },
   },
-},
   userInterfaceStyle: 'automatic',
   plugins: [
     'expo-router',

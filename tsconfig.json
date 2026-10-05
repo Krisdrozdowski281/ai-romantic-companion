@@ -11,5 +11,10 @@
     }
   },
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
-  "exclude": ["node_modules", "**/*-Laptop.ts", "**/*-Laptop.tsx"]
+  "exclude": [
+    "node_modules",
+    "supabase/functions",
+    "**/*-Laptop.ts",
+    "**/*-Laptop.tsx"
+  ]
 }

@@ -6,6 +6,7 @@ import type {
   VoiceErrorCode,
   VoiceState,
 } from './types';
+import type { VoiceSessionAuthorizer } from './SupabaseVoiceSessionAuthorizer';
 
 type Listener = () => void;
 
@@ -17,16 +18,18 @@ const INITIAL_STATE: VoiceState = {
 };
 
 export interface VoiceServiceOptions {
+  /** Legacy test-only compatibility; production uses sessionAuthorizer. */
   agentId?: string;
   configurationError?: string;
   permissionGateway: MicrophonePermissionGateway;
+  sessionAuthorizer?: VoiceSessionAuthorizer;
 }
 
 export class VoiceService {
   private adapter: VoiceAdapter | null = null;
   private state: VoiceState;
   private readonly listeners = new Set<Listener>();
-  private readonly agentId: string | undefined;
+  private readonly sessionAuthorizer: VoiceSessionAuthorizer;
   private readonly permissionGateway: MicrophonePermissionGateway;
   private desiredActive = false;
   private hasConnected = false;
@@ -35,7 +38,9 @@ export class VoiceService {
   private disposed = false;
 
   constructor(options: VoiceServiceOptions) {
-    this.agentId = options.agentId;
+    this.sessionAuthorizer = options.sessionAuthorizer ?? {
+      authorize: async () => options.agentId ?? '',
+    };
     this.permissionGateway = options.permissionGateway;
     this.state = options.configurationError
       ? {
@@ -67,11 +72,6 @@ export class VoiceService {
       return;
     }
 
-    if (!this.agentId) {
-      this.fail('configuration', 'A valid development agent ID is required.');
-      return;
-    }
-
     if (!this.adapter) {
       this.fail('sdk', 'Voice SDK is not ready. Close and reopen this screen.');
       return;
@@ -95,7 +95,11 @@ export class VoiceService {
       this.desiredActive = true;
       this.hasConnected = false;
       this.setState({ ...this.state, connection: 'connecting', error: null });
-      await this.adapter.startSession(this.agentId);
+      const conversationToken = await this.sessionAuthorizer.authorize();
+      if (!conversationToken)
+        throw new Error('Voice authorization is unavailable.');
+      if (operationId !== this.operationId || this.disposed) return;
+      await this.adapter.startSession(conversationToken);
     } catch (error: unknown) {
       if (operationId !== this.operationId || this.disposed) return;
       this.desiredActive = false;

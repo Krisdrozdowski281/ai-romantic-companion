@@ -1,7 +1,3 @@
 /// <reference types="expo/types" />
 
-declare namespace NodeJS {
-  interface ProcessEnv {
-    EXPO_PUBLIC_ELEVENLABS_AGENT_ID?: string;
-  }
-}
+// NOTE: This file should not be edited and should be in your git ignore
