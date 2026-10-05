@@ -11,7 +11,7 @@ select throws_ok($$select public.complete_onboarding(true,false)$$,'22023','Both
 select lives_ok($$select public.complete_onboarding(true,true)$$,'onboarding creates own profile and defaults');
 select is((select count(*)::integer from public.profiles),1,'reads own profile');
 select ok((select adult_declared_at is not null and onboarding_completed_at is not null and accepted_disclosure_version = '2026-07-27' from public.profiles),'consent recorded');
-select is((select voice_id from public.companion_preferences),'voice_hope','default preference recorded');
+select is((select voice_id from public.companion_preferences),'voice_charlotte','default preference recorded');
 select lives_ok($$update public.companion_preferences set personality_mode_id='playful',voice_id='voice_sarah'$$,'can update own preferences');
 select is((select personality_mode_id from public.companion_preferences),'playful','preference persists');
 select throws_ok($$update public.companion_preferences set voice_id='arbitrary_voice'$$,'23514',null,'arbitrary voice rejected');

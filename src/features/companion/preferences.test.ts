@@ -1,4 +1,4 @@
-import { isPreferenceSelection } from './preferences';
+import { DEFAULT_PREFERENCES, isPreferenceSelection } from './preferences';
 describe('preference validation', () => {
   it('allows only configured selections', () => {
     expect(
@@ -13,5 +13,12 @@ describe('preference validation', () => {
         voiceId: 'anything',
       }),
     ).toBe(false);
+  });
+});
+
+it('defaults to the approved Charlotte development voice', () => {
+  expect(DEFAULT_PREFERENCES).toEqual({
+    personalityModeId: 'caring',
+    voiceId: 'voice_charlotte',
   });
 });

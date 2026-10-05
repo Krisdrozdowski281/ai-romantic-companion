@@ -14,26 +14,37 @@ Date: 2026-10-05. Branch: codex/sprint-2-auth-hardening.
 ## Verification
 
 - Fresh npm ci: passed.
-- npm run verify: formatting, lint, strict TypeScript and 51 tests across 13 suites passed.
+- npm run verify: formatting, lint, strict TypeScript and 52 tests across 13 suites passed.
 - npm run check:edge: passed.
 - npm run test:edge: 8 tests passed, including signed/missing/expired/forged JWT cases with mocked dependencies.
-- npm run test:db: both migrations applied to a temporary empty database; 27 pgTAP assertions passed. Existing local users/data preserved.
+- npm run test:db: all three migrations applied to a temporary empty database; 27 pgTAP assertions passed. Existing local users/data preserved.
 - npx expo export --platform android --output-dir .expo/sprint2-export: passed; 1555 modules bundled.
 - Final staged diff checked for whitespace, credentials, local files and sprint scope.
 
 These are automated and bundle checks, not physical-device acceptance.
 
-## Pending development environment and acceptance
+## Development deployment
 
-Cloud writes require explicit approval under the shared AGENTS.md. Approval has been requested for the existing development project; deployment has not been performed.
+Kris explicitly approved development deployment on 2026-10-05 and selected Charlotte.
 
-Read-only inspection found existing ElevenLabs agent/API secrets, but not ELEVENLABS_VOICE_HOPE, ELEVENLABS_VOICE_SARAH or ELEVENLABS_VOICE_CHARLOTTE. Configure approved voice IDs server-side before deploying the updated function. Never paste API keys into chat.
+- Resumed the paused existing project rekodexqrqzizujtpxwy; verified ACTIVE_HEALTHY.
+- Linked the CLI. Its existing-temp-directory bug required preserving previous link metadata under ignored .expo/sprint2-link-backup.
+- Direct CLI database dry run could not connect from this network. Used the authenticated Supabase Management API instead.
+- Inspected existing columns, constraints, RLS and policies: they matched the original foundation migration, but no migration history existed.
+- Recorded the verified original migration as a baseline, then applied hardening and Charlotte-default migrations with history entries in one transaction. Existing user rows and preferences were preserved.
+- Configured only ELEVENLABS_VOICE_CHARLOTTE from the officially documented Charlotte ID. Existing agent/API secrets were preserved; Hope/Sarah remain unconfigured.
+- Deployed elevenlabs-session version 14 and verified ACTIVE.
+- Live unauthenticated and invalid-token requests: safe 401 responses; CORS OPTIONS: 204. No authenticated provider token or paid audio calls were made.
+- Verified remote RLS, disabled anonymous reads/deletes, Charlotte RPC default and migration history.
+- Confirmed email sign-in and email confirmation enabled. Added ai-companion://sign-in to the existing redirect allow-list while preserving other entries.
 
-The CLI database dry run could not find a linked project ref. Complete supabase link privately, then review migration dry-run output before applying. Verify the ElevenLabs development agent is private, its voice override setting and personality_mode template are configured, and arbitrary prompt overrides remain disabled.
+## Pending acceptance
+
+Verify the ElevenLabs development agent is private, its voice override setting and personality_mode template are configured, and arbitrary prompt overrides remain disabled. These provider settings have not been changed or verified in this deployment.
 
 Physical Android registration, confirmation, sign-in, restart restoration, onboarding, persistence, mute, interruption, End, navigation and logout acceptance remain unverified. Android SDK/adb were not available in this environment. Do not start Sprint 3 until private-agent voice passes on the phone.
 
-No paid ElevenLabs calls were made. No cloud migration or function deployment was made.
+No paid ElevenLabs calls were made. Supabase development deployment was completed after explicit approval.
 
 ## Remaining risks
 
@@ -41,4 +52,4 @@ npm audit --omit=dev reported 33 dependency advisories (21 high, 12 moderate, ze
 
 Provider conversation tokens do not by themselves cryptographically bind every client initialization override. Review agent settings as documented in README. Age declaration is self-attestation, not identity or age verification.
 
-Sprint 2 code is ready for review; full completion still requires deployment/configuration and physical acceptance.
+Sprint 2 code is ready for review; full completion still requires provider configuration verification and physical acceptance.

@@ -24,7 +24,7 @@ export interface Preferences {
 }
 export const DEFAULT_PREFERENCES: Preferences = {
   personalityModeId: 'caring',
-  voiceId: 'voice_hope',
+  voiceId: 'voice_charlotte',
 };
 export const VOICE_LABELS: Record<VoiceId, string> = {
   voice_hope: 'Hope',

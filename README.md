@@ -10,6 +10,7 @@ This requires an **Expo development build**, not Expo Go. Native ElevenLabs/Live
 - Protected Expo Router groups. The home, settings and conversation screens require sign-in and completed onboarding.
 - An explicit 18+ declaration and versioned AI disclosure, saved together with default preferences by an atomic database function.
 - Caring, Playful and Confident personality choices, plus Hope, Sarah and Charlotte voice slots configured by the developer.
+- Charlotte is the approved development default. Only its server mapping is configured currently; Hope and Sarah return a safe unavailable error until their IDs are configured. Existing saved preferences are preserved: select Charlotte in Settings if needed.
 - Saved preferences reload after restarting. The server reads the signed-in user's preferences immediately before granting a voice session.
 - Private WebRTC conversation tokens. Permanent ElevenLabs credentials stay in Edge Function secrets.
 - Voice start/end/mute/listening/speaking/reconnect/error states, navigation/logout cleanup and cancellation guards.
